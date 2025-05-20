@@ -1,0 +1,8 @@
+#ifndef HORMIGAINFECTADA_H
+#define HORMIGAINFECTADA_H
+
+
+
+
+
+#endif //HORMIGAINFECTADA_H
