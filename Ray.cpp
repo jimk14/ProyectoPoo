@@ -6,41 +6,43 @@ Ray::Ray(int vitalidad, sf::Vector2f posicion)
     actualizarSprite();
 }
 
+
+
 void Ray::cargarTexturaRay() {
-        if (!HormigaNormal.loadFromFile("ray.png")) {
-            return;
-        }
-        HormigaSprite.setTexture(HormigaNormal);
+    sf::Texture texture;
+    if (!texture.loadFromFile("ray.png")) {
+        return;
+    }
+    sf::RectangleShape rectangle({100,150});
+    rectangle.setTexture(&texture);
+    rectangle.setFillColor(sf::Color::White);
+    rectangle.setPosition(sf::Vector2f(0, 900 - rectangle.getSize().y));
+        HormigaSprite.setTexture(texture);
         actualizarsprite();
     }
 
 
 void Ray::mover(const std::string& direccion) {
-    float velocidad = 5.0;
-
-    if (direccion == "izquierda") {
-        posicion.x -= velocidad;
-        HormigaSprite.setScale({-1.f, 1.f});
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
+        HormigaSprite.move(sf::Vector2f(0, -velocity));
     }
-    else if (direccion == "derecha") {
-        posicion.x += velocidad;
-        HormigaSprite.setScale({1, 1});
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
+        HormigaSprite.move(sf::Vector2f(0, velocity));
     }
-    else if (direccion == "arriba") {
-        posicion.y -= velocidad;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
+        HormigaSprite.move(sf::Vector2f(-velocity, 0));
     }
-    else if (direccion == "abajo") {
-        posicion.y += velocidad;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
+        HormigaSprite.move(sf::Vector2f(velocity, 0));
     }
-
-    actualizarSprite();
 }
-
 void Ray::actualizarSprite() {
     HormigaSprite.setPosition(posicion);
 }
 
-
+void Ray::dibujar(sf::RenderWindow& window) {
+    window.draw(HormigaSprite);
+}
 void usarSuperColpedeLuz() {
 
 }
