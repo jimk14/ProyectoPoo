@@ -1,53 +1,64 @@
 #include "HormigaInfectada.h"
-#include <cstdlib>
+#include <iostream>
 
-HormigaInfectada::HormigaInfectada(int vitalidad, sf::Vector2f posicion)
-    : Hormiga(80, 10, vitalidad, posicion) {
-    estadoActual = 0;
-    tiempoCambio = 1.0f;
-    cargarTexturas();
-    actualizarSprite();
+HormigaInfectada::HormigaInfectada(): sprite(sprite) {
+    if (!texturaViva.loadFromFile("assets/infectada 1.png"))
+        std::cerr << "Error al cargar infectada 1.png\n";
+
+    if (!texturaAtaque.loadFromFile("assets/Infectada 3.png"))
+        std::cerr << "Error al cargar Infectada 3.png\n";
+
+    if (!texturaMuerta.loadFromFile("assets/infectada 4.png"))
+        std::cerr << "Error al cargar infectada 4.png\n";
+
+    sprite.setTexture(texturaViva);
+    posicion = sf::Vector2f(50, 300);
+    sprite.setPosition(posicion);
+
+    velocidad = 1.0f;
+    vida = 1;
+    viva = true;
 }
 
-void HormigaInfectada::cargarTexturas() {
-    sf::Texture temp;
+void HormigaInfectada::actualizar() {
+    if (!viva) return;
 
+    posicion.x += velocidad;
+    sprite.setPosition(posicion);
 
-    temp.loadFromFile("infectada 1.png");
-    texturasInfectada.push_back(temp);
-
-    // estado 1: atacando
-    temp.loadFromFile("infectada 2.png");
-    texturasInfectada.push_back(temp);
-
-    // estado 2: liberando esporas
-    temp.loadFromFile("Infectada 3.png");
-    texturasInfectada.push_back(temp);
-
-    HormigaSprite.setTexture(texturasInfectada[estadoActual]);
-}
-
-void HormigaInfectada::cambiarEstado() {
-    if (reloj.getElapsedTime().asSeconds() >= tiempoCambio) {
-        estadoActual = (estadoActual + 1) % texturasInfectada.size();
-        HormigaSprite.setTexture(texturasInfectada[estadoActual]);
-        reloj.restart();
+    if (rand() % 100 < 2) {
+        atacar();
+    } else {
+        sprite.setTexture(texturaViva); 
     }
 }
 
-void HormigaInfectada::mover() {
-    float dx = (rand() % 3 - 1) * 2.0f;
-    float dy = (rand() % 3 - 1) * 2.0f;
-    posicion.x += dx;
-    posicion.y += dy;
-    actualizarSprite();
+void HormigaInfectada::dibujar(sf::RenderWindow &ventana) {
+    ventana.draw(sprite);
 }
 
 void HormigaInfectada::atacar() {
-    estadoActual = 1;
-    HormigaSprite.setTexture(texturasInfectada[estadoActual]);
+    sprite.setTexture(texturaAtaque); 
+    std::cout << "La hormiga infectada ataca con esporas tóxicas." << std::endl;
 }
 
-void HormigaInfectada::actualizarSprite() {
-    HormigaSprite.setPosition(posicion);
+bool HormigaInfectada::estaViva() const {
+    return viva;
+}
+
+void HormigaInfectada::recibirDano(int cantidad) {
+    vida -= cantidad;
+    if (vida <= 0) {
+        viva = false;
+        sprite.setTexture(texturaMuerta); 
+        std::cout << "¡Hormiga infectada eliminada!" << std::endl;
+    }
+}
+
+void HormigaInfectada::mostrarBarraVida() {
+    std::cout << "[VIDA INFECTADA]: ";
+    if (vida > 0)
+        std::cout << "|#|" << std::endl;
+    else
+        std::cout << "| | (muerta)" << std::endl;
 }
