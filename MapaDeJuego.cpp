@@ -1,60 +1,41 @@
-#include "mapadejuego.h"
-#include "ray.h"
-#include <SFML/Graphics.hpp>
+#include "MapaDeJuego.h"
+#include <iostream>
 
-MapaDeJuego::MapaDeJuego(sf::RenderWindow& ventana, Ray& jugador)
-    : window(ventana), ray(jugador), enFondo(), fondo(fondo)
-{
+MapaDeJuego::MapaDeJuego(): fondo(fondo), enFondo(1) {
+    if (!textura1.loadFromFile("npc.png"))
+        std::cerr << "No se pudo cargar npc.png\n";
+    if (!textura2.loadFromFile("pasillo.jpg"))
+        std::cerr << "No se pudo cargar pasillo.jpg\n";
+    if (!textura3.loadFromFile("antesala.jpg"))
+        std::cerr << "No se pudo cargar antesala.jpg\n";
+    if (!textura4.loadFromFile("sala.jpg"))
+        std::cerr << "No se pudo cargar sala.jpg\n";
 
-
-
-    sueloY = static_cast<float>(window.getSize().y) - 150.0f; // altura de Ray
+    fondo.setTexture(textura1);
 }
 
-bool MapaDeJuego::estaAbierto() const {
-    return window.isOpen();
-}
-
-void MapaDeJuego::procesarEventos() {
-    while (window.isOpen()) {
-        while (const std::optional event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>())
-                window.close();
-        }
-    }
-}
-void MapaDeJuego::actualizar() {
-    sf::Sprite sprite(textura1);
-
-    float scaleX = static_cast<float>(window.getSize().x) / textura1.getSize().x;
-    float scaleY = static_cast<float>(window.getSize().y) / textura1.getSize().y;
-    sprite.setScale({scaleX,scaleY});
-    sprite.setPosition(sf::Vector2f(0, 0));
-
-    textura1.loadFromFile("npc.png");
-    textura2.loadFromFile("pasillo.jpg");
-    textura3.loadFromFile("antesala.jpg");
-    textura4.loadFromFile("sala.jpg");
-
-
-
+void MapaDeJuego::actualizar(const Ray& ray) {
     sf::Vector2f pos = ray.getPosicion();
 
-    if (pos.x > window.getSize().x) {
+    if (pos.x > 1900.f) {  // Tamaño de la ventana (ajústalo si cambia)
         if (enFondo == 1) {
-            sprite.setTexture(textura2);
+            fondo.setTexture(textura2);
             enFondo = 2;
-            ray.setPosicion({0, pos.y});
         } else if (enFondo == 2) {
-            sprite.setTexture(textura3);
+            fondo.setTexture(textura3);
             enFondo = 3;
-            ray.setPosicion({0, pos.y});
+        } else if (enFondo == 3) {
+            fondo.setTexture(textura4);
+            enFondo = 4;
         }
     }
+
+    // Ajustar escala para cubrir ventana
+    auto size = fondo.getTexture().getSize();
+    fondo.setScale(sf::Vector2f(1000.0f / size.x, 1000.0f / size.y));
+    fondo.setPosition(sf::Vector2f(0.0f,0.0f));
 }
-void MapaDeJuego::dibujar() {
-    window.clear();
+
+void MapaDeJuego::dibujar(sf::RenderWindow& window) {
     window.draw(fondo);
-    ray.dibujar(window);
-    window.display();
 }
