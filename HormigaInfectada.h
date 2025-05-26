@@ -1,26 +1,27 @@
 #ifndef HORMIGAINFECTADA_H
 #define HORMIGAINFECTADA_H
 
-#include "Hormiga.h"
 #include <SFML/Graphics.hpp>
-#include <string>
-#include <vector>
 
-class HormigaInfectada : public Hormiga {
+class HormigaInfectada {
 private:
-    std::vector<sf::Texture> texturasInfectada;
-    int estadoActual;
-    float tiempoCambio;
-    sf::Clock reloj;
+    sf::Texture texturaViva;
+    sf::Texture texturaAtaque;
+    sf::Texture texturaMuerta;  
+    sf::Sprite sprite;
+    sf::Vector2f posicion;
+    float velocidad;
+    bool viva;
+    int vida;
 
 public:
-    HormigaInfectada(int vitalidad, sf::Vector2f posicion);
-
-    void cargarTexturas();
-    void cambiarEstado();
-    void mover();
+    HormigaInfectada();
+    void actualizar();
+    void dibujar(sf::RenderWindow &ventana);
     void atacar();
-    void actualizarSprite();
+    bool estaViva() const;
+    void recibirDano(int cantidad);
+    void mostrarBarraVida();
 };
 
 #endif
