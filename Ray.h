@@ -1,23 +1,51 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include "Hormiga.h"
-#include <SFML/Graphics.hpp>
+#include "Personaje.h"
+#include "Baston.h"
+#include <vector>
+#include <map>
+#include <string>
+#include <iostream>
 
-class Ray : public Hormiga {
+class Ray : public Personaje {
 private:
-    void cargarTexturaRay();
-    float velocity = 5;
+    Baston baston;
+    sf::Texture texturaReposo;
+    sf::Texture texturaSalto;
+    std::vector<sf::Texture> texturasCaminar;
+    sf::Texture texturaGolpe;
+    sf::Texture texturaLuz;
+    std::map<std::string, int> inventario;
+
+    int frame, frameCounter, frameDelay;
+    int accionFrameCounter, accionFrameDelay;
+    bool enAccionEspecial;
+    bool mirandoDerecha;
+
+    int vidaMaxima = 200;
+    int vidaActual = 200;
+
+    float energiaLuz;
+    float energiaMaxima = 100.f;
+    float energiaRecargaVelocidad = 20.f; // por segundo
+
 public:
-    Ray(int vitalidad, sf::Vector2f posicion);
-    void dibujar (sf::RenderWindow& window);
+    Ray();
 
-    void mover(const std::string& direccion);
-    void actualizarSprite();
+    void manejarEntrada() override;
+    void actualizar() override;
+    void dibujar(sf::RenderWindow& window) override;
 
-    // Métodos específicos de Ray
-    void usarSuperColpedeLuz();
-    void usarBaston();
+    void recargarLuz(int cantidad);
+    void recibirDanyo(int cantidad);
+    int getVida() const { return vidaActual; }
+    int getVidaMaxima() const { return vidaMaxima; }
+    sf::Vector2f getPosicion() const;
+    sf::Texture texturaMuerte;
+    bool estaMuerto() const { return vidaActual <= 0; }
+    void agregarAlimento(const std::string& item);
+    void mostrarInventario() const;
 };
 
-#endif // RAY_H
+#endif
